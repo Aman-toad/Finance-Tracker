@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Tracker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fira+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+      rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <link rel="stylesheet" href="styles.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
+
+  <body>
+
+    <header>
+      <div class="head-bg">
+        <img src="finance  bg.jpg">
+      </div>
+      <div class="wrapper">
+        <div class="main-head">
+          <div class="main-left">
+            <span>FinTrack - </span>
+            <h1 class="title"> Your Finance Tracker</h1>
+          </div>
+          <div class="toggling">
+            <input type="checkbox" id="darkmode" />
+            <label class="toggle-label" for="darkmode"></label>
+          </div>
+          <div class="btn-name-icon">
+            <div class="login">
+              <button class="login-btn">Set Up</button>
+            </div>
+            <div class="username"></div>
+          </div>
+        </div>
+        <div class="navbars">
+          <li><a href="#dashboard">Dashboard</a></li>
+          <li><a href="#charts">My Expenses</a></li>
+          <li><a href="#summary">Account Info</a></li>
+          <li><a href="#summary">Transactions</a></li>
+          <li><a href="#about">About Us</a></li>
+        </div>
+      </div>
+    </header>
+
+    <section id="dashboard">
+      <div class="left-text">
+        <h1>Your Personal Finance Dashboard - Anytime, Anywhere.</h1>
+        <p class="text">Stay on top of your finances with an easy-to-use expense tracker. Monitor your income, track
+          spending, and visualize your financial health with insightful graphs...</p>
+      </div>
+      <div class="right-dashboard">
+        <canvas id="barChart" class="bar-chart" style=" background-color: rgb(255, 255, 255);"></canvas>
+        <h1 align="center" style="margin-top: 10px;">Income vs Expenses</h1>
+      </div>
+    </section>
+
+    <section id="charts">
+      <div>
+        <canvas id="expenseChart" class="pie-chart" width="446" height="223"></canvas>
+        <h1 align="center" style="margin-top: 10px;">Expense Pie-Chart</h1>
+      </div>
+      <div>
+        <canvas id="lineChart" class="line-chart" width="700" height="350"
+          style="background-color: aliceblue;"></canvas>
+        <h1 align="center" style="margin-top: 10px;">Monthly income and expenses over a year</h1>
+      </div>
+    </section>
+
+    <section id="summary">
+      <div class="summary-head">
+        <h1>Summary</h1>
+      </div>
+      <div class="summary-cards">
+        <div class="income-card">
+          <div class="income">
+            <h1>Total Income &#128176;</h1>
+            <div class="content">
+              <span class="rupee">&#8377;</span>
+              <p id="showIncome">0</p>
+              <span class="upArrow">&#8593;</span>
+            </div>
+          </div>
+        </div>
+        <div class="expense-card">
+          <div class="expense">
+            <h1>Total Expenses &#x1F4B8;</h1>
+            <div class="content">
+              <span class="rupee">&#8377;</span>
+              <p id="showExpense">0</p>
+              <span class="downArrow">&#8595;</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="balance-card">
+          <div class="balance">
+            <h1>Current Balance &#128202;</h1>
+            <div class="content">
+              <span class="rupee">&#8377;</span>
+              <p id="showBalance">0</p>
+              <span class="bank">&#x1f3e6;</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="trans-list">
+        <div class="transaction-cards">
+          <div class="trans-card-head">
+            <h1>Transaction History</h1>
+          </div>
+          <div class="cards-box">
+            <div class="first-card">
+              <div class="left-side">
+                <div class="amt-categ">
+                  <span class="amount">₹0</span>
+                  <div class="category">(Category)
+                  </div>
+                </div>
+                <div class="descr">
+                  <p class="description">Discription</p>
+                </div>
+              </div>
+              <div class="right-side">
+                <p class="date">YYYY-MM-DD</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="transaction-form">
+      <button id="openModal" class="addbtn">Add New Transaction</button>
+
+      <!-- Modal (bankly Hidden) -->
+      <div id="modal" class="modal">
+        <div class="modal-content">
+          <span id="closeModal" class="close">&times;</span>
+          <h2>Add Transaction</h2>
+
+          <form id="transactionForm">
+            <label for="js-amount">Amount:</label>
+            <input type="number" id="js-amount" required>
+
+            <label for="type">Type:</label>
+            <select id="type">
+              <option value="income">Income</option>
+              <option value="expense">Expense</option>
+            </select>
+
+            <label for="category">Category:</label>
+            <select id="category">
+              <option value="food">Food</option>
+              <option value="travel">Travel</option>
+              <option value="shopping">Shopping</option>
+              <option value="rent">Rent</option>
+              <option value="salary">Salary</option>
+              <option value="other">Other</option>
+            </select>
+
+            <label for="js-description">Description:</label>
+            <input type="text" id="js-description" maxlength="35">
+
+            <label for="js-date">Date:</label>
+            <input type="date" id="js-date" required>
+
+            <button type="submit" class="add-trans" onclick="submitbtn()">Add Transaction</button>
+          </form>
+        </div>
+      </div>
+      <button class="clearbtn" onclick="clearAllTransactions()">Clear All Transactions</button>
+    </section>
+
+    <!-- userInfo form -->
+
+    <section id="userInfo">
+      <div class="modal-overlay" id="userModal">
+        <div class="oneTimeModal">
+          <h1>Welcome! Let's Set Up Your Finances</h1>
+          <form id="userInfoForm">
+            <label for="name">Username:</label>
+            <input type="text" id="name" required>
+
+            <label for="bankBalance">Bank Balance:</label>
+            <input type="number" id="bankBalance" required>
+
+            <label for="monthlyIncome">Monthly Income:</label>
+            <input type="number" id="monthlyIncome" required>
+
+            <label for="expenseLimit">Expense Limit:</label>
+            <input type="number" id="expenseLimit" required>
+
+            <button type="submit" id="saveInfo">Save</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <section id="permission">
+      <div class="permit">
+        <h1>Are you sure you want to delete all the Transactions/Data ?</h1>
+        <div class="permit-btns">
+          <button class="yes-btn">
+            Yes
+          </button>
+          <button class="no-btn">
+            No
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section id="resetEverything">
+      <button class="resetBtn" onclick="resetEverything()">
+        <i class="fa-solid fa-xmark"></i> Reset Everything</button>
+    </section>
+
+
+    <script src="script.js"></script>
+  </body>
+
+</html>
