@@ -13,7 +13,6 @@ body {
   color: rgb(0, 0, 0);
   transition: background-color 0.3s ease-in-out;
   font-family: 'Fira sans', sans-serif, Arial, Helvetica, sans-serif;
-  background: conic-gradient(from -45deg, #3498db,#2ecc71, #9b59b6, #e7b25e);
 }
 
 span {
