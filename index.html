@@ -1,231 +1,286 @@
 <!DOCTYPE html>
 <html lang="en">
-
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Expense Tracker</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Fira+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
-      rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
-    <link rel="stylesheet" href="styles.css">
-
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  </head>
-
-  <body>
-
-    <header>
-      <div class="head-bg">
-        <img src="finance  bg.jpg">
-      </div>
-      <div class="wrapper">
-        <div class="main-head">
-          <div class="main-left">
-            <span>FinTrack - </span>
-            <h1 class="title"> Your Finance Tracker</h1>
-          </div>
-          <div class="toggling">
-            <input type="checkbox" id="darkmode" />
-            <label class="toggle-label" for="darkmode"></label>
-          </div>
-          <div class="btn-name-icon">
-            <div class="login">
-              <button class="login-btn">Set Up</button>
-            </div>
-            <div class="username"></div>
-          </div>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FinTrack - Expense Tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <header>
+    <div class="header-container">
+      <div class="logo-container">
+        <div class="logo">
+          <i class="fa-solid fa-wallet"></i>
+          <h1><span>Fin</span>Track</h1>
         </div>
-        <div class="navbars">
-          <li><a href="#dashboard">Dashboard</a></li>
-          <li><a href="#charts">My Expenses</a></li>
-          <li><a href="#summary">Account Info</a></li>
-          <li><a href="#summary">Transactions</a></li>
-          <li><a href="#about">About Us</a></li>
+        <p class="tagline">Your Personal Finance Tracker</p>
+      </div>
+      
+      <div class="header-actions">
+        <div class="theme-toggle">
+          <input type="checkbox" id="darkmode" />
+          <label class="toggle-label" for="darkmode">
+            <i class="fa-solid fa-sun"></i>
+            <i class="fa-solid fa-moon"></i>
+            <span class="toggle-ball"></span>
+          </label>
+        </div>
+        
+        <div class="user-section">
+          <button class="login-btn">Set Up Account</button>
+          <div class="username"></div>
         </div>
       </div>
-    </header>
+    </div>
+    
+    <nav class="main-nav">
+      <ul>
+        <li><a href="#dashboard" class="active"><i class="fa-solid fa-chart-line"></i> Dashboard</a></li>
+        <li><a href="#charts"><i class="fa-solid fa-chart-pie"></i> My Expenses</a></li>
+        <li><a href="#summary"><i class="fa-solid fa-wallet"></i> Account Info</a></li>
+        <li><a href="#transaction-form"><i class="fa-solid fa-money-bill-transfer"></i> Transactions</a></li>
+      </ul>
+    </nav>
+  </header>
 
-    <section id="dashboard">
-      <div class="left-text">
-        <h1>Your Personal Finance Dashboard - Anytime, Anywhere.</h1>
-        <p class="text">Stay on top of your finances with an easy-to-use expense tracker. Monitor your income, track
-          spending, and visualize your financial health with insightful graphs...</p>
-      </div>
-      <div class="right-dashboard">
-        <canvas id="barChart" class="bar-chart" style=" background-color: rgb(255, 255, 255);"></canvas>
-        <h1 align="center" style="margin-top: 10px;">Income vs Expenses</h1>
+  <main>
+    <section id="dashboard" class="dashboard-section">
+      <div class="dashboard-content">
+        <div class="dashboard-text">
+          <h2>Your Personal Finance Dashboard</h2>
+          <p>Stay on top of your finances with an easy-to-use expense tracker. Monitor your income, track spending, and visualize your financial health with insightful graphs.</p>
+          <button id="quick-add" class="primary-btn"><i class="fa-solid fa-plus"></i> Quick Add Transaction</button>
+        </div>
+        <div class="dashboard-chart">
+          <canvas id="barChart"></canvas>
+          <h3>Income vs Expenses</h3>
+        </div>
       </div>
     </section>
 
-    <section id="charts">
-      <div>
-        <canvas id="expenseChart" class="pie-chart" width="446" height="223"></canvas>
-        <h1 align="center" style="margin-top: 10px;">Expense Pie-Chart</h1>
-      </div>
-      <div>
-        <canvas id="lineChart" class="line-chart" width="700" height="350"
-          style="background-color: aliceblue;"></canvas>
-        <h1 align="center" style="margin-top: 10px;">Monthly income and expenses over a year</h1>
+    <section id="charts" class="charts-section">
+      <h2 class="section-title">Financial Analytics</h2>
+      <div class="charts-container">
+        <div class="chart-card">
+          <canvas id="expenseChart"></canvas>
+          <h3>Expense Breakdown</h3>
+        </div>
+        <div class="chart-card">
+          <canvas id="lineChart"></canvas>
+          <h3>Monthly Trends</h3>
+        </div>
       </div>
     </section>
 
-    <section id="summary">
-      <div class="summary-head">
-        <h1>Summary</h1>
-      </div>
+    <section id="summary" class="summary-section">
+      <h2 class="section-title">Financial Summary</h2>
       <div class="summary-cards">
-        <div class="income-card">
-          <div class="income">
-            <h1>Total Income &#128176;</h1>
-            <div class="content">
-              <span class="rupee">&#8377;</span>
-              <p id="showIncome">0</p>
-              <span class="upArrow">&#8593;</span>
+        <div class="summary-card income">
+          <div class="card-icon">
+            <i class="fa-solid fa-arrow-trend-up"></i>
+          </div>
+          <div class="card-content">
+            <h3>Total Income</h3>
+            <div class="amount">
+              <span class="currency">₹</span>
+              <span id="showIncome">0</span>
             </div>
           </div>
         </div>
-        <div class="expense-card">
-          <div class="expense">
-            <h1>Total Expenses &#x1F4B8;</h1>
-            <div class="content">
-              <span class="rupee">&#8377;</span>
-              <p id="showExpense">0</p>
-              <span class="downArrow">&#8595;</span>
+        
+        <div class="summary-card expense">
+          <div class="card-icon">
+            <i class="fa-solid fa-arrow-trend-down"></i>
+          </div>
+          <div class="card-content">
+            <h3>Total Expenses</h3>
+            <div class="amount">
+              <span class="currency">₹</span>
+              <span id="showExpense">0</span>
             </div>
           </div>
         </div>
-
-        <div class="balance-card">
-          <div class="balance">
-            <h1>Current Balance &#128202;</h1>
-            <div class="content">
-              <span class="rupee">&#8377;</span>
-              <p id="showBalance">0</p>
-              <span class="bank">&#x1f3e6;</span>
+        
+        <div class="summary-card balance">
+          <div class="card-icon">
+            <i class="fa-solid fa-sack-dollar"></i>
+          </div>
+          <div class="card-content">
+            <h3>Current Balance</h3>
+            <div class="amount">
+              <span class="currency">₹</span>
+              <span id="showBalance">0</span>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="trans-list">
-        <div class="transaction-cards">
-          <div class="trans-card-head">
-            <h1>Transaction History</h1>
-          </div>
-          <div class="cards-box">
-            <div class="first-card">
-              <div class="left-side">
-                <div class="amt-categ">
-                  <span class="amount">₹0</span>
-                  <div class="category">(Category)
-                  </div>
-                </div>
-                <div class="descr">
-                  <p class="description">Discription</p>
-                </div>
-              </div>
-              <div class="right-side">
-                <p class="date">YYYY-MM-DD</p>
-              </div>
-            </div>
+      <div class="transaction-history">
+        <div class="history-header">
+          <h3><i class="fa-solid fa-clock-rotate-left"></i> Transaction History</h3>
+          <button id="filter-btn" class="secondary-btn"><i class="fa-solid fa-filter"></i> Filter</button>
+        </div>
+        
+        <div class="transaction-list" id="transaction-list">
+          <!-- Transactions will be added here dynamically -->
+          <div class="empty-state">
+            <i class="fa-solid fa-receipt"></i>
+            <p>No transactions yet. Add your first transaction to get started!</p>
           </div>
         </div>
       </div>
     </section>
 
-    <section id="transaction-form">
-      <button id="openModal" class="addbtn">Add New Transaction</button>
+    <section id="transaction-form" class="transaction-form-section">
+      <h2 class="section-title">Manage Transactions</h2>
+      <div class="action-buttons">
+        <button id="openModal" class="primary-btn"><i class="fa-solid fa-plus"></i> Add New Transaction</button>
+        <button class="danger-btn clearbtn"><i class="fa-solid fa-trash"></i> Clear All Transactions</button>
+        <button class="warning-btn resetBtn"><i class="fa-solid fa-rotate"></i> Reset Everything</button>
+      </div>
+    </section>
+  </main>
 
-      <!-- Modal (bankly Hidden) -->
-      <div id="modal" class="modal">
-        <div class="modal-content">
-          <span id="closeModal" class="close">&times;</span>
-          <h2>Add Transaction</h2>
+  <!-- Transaction Modal -->
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Add Transaction</h2>
+        <button id="closeModal" class="close-btn"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      
+      <form id="transactionForm">
+        <div class="form-group">
+          <label for="js-amount">Amount</label>
+          <div class="input-with-icon">
+            <i class="fa-solid fa-indian-rupee-sign"></i>
+            <input type="number" id="js-amount" placeholder="Enter amount" required>
+          </div>
+        </div>
 
-          <form id="transactionForm">
-            <label for="js-amount">Amount:</label>
-            <input type="number" id="js-amount" required>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="type">Type</label>
+            <div class="select-wrapper">
+              <select id="type">
+                <option value="income">Income</option>
+                <option value="expense">Expense</option>
+              </select>
+              <i class="fa-solid fa-chevron-down"></i>
+            </div>
+          </div>
 
-            <label for="type">Type:</label>
-            <select id="type">
-              <option value="income">Income</option>
-              <option value="expense">Expense</option>
-            </select>
+          <div class="form-group">
+            <label for="category">Category</label>
+            <div class="select-wrapper">
+              <select id="category">
+                <option value="food">Food</option>
+                <option value="travel">Travel</option>
+                <option value="shopping">Shopping</option>
+                <option value="rent">Rent</option>
+                <option value="salary">Salary</option>
+                <option value="investment">Investment</option>
+                <option value="entertainment">Entertainment</option>
+                <option value="utilities">Utilities</option>
+                <option value="other">Other</option>
+              </select>
+              <i class="fa-solid fa-chevron-down"></i>
+            </div>
+          </div>
+        </div>
 
-            <label for="category">Category:</label>
-            <select id="category">
-              <option value="food">Food</option>
-              <option value="travel">Travel</option>
-              <option value="shopping">Shopping</option>
-              <option value="rent">Rent</option>
-              <option value="salary">Salary</option>
-              <option value="other">Other</option>
-            </select>
+        <div class="form-group">
+          <label for="js-description">Description</label>
+          <div class="input-with-icon">
+            <i class="fa-solid fa-align-left"></i>
+            <input type="text" id="js-description" placeholder="What's this transaction for?" maxlength="35">
+          </div>
+        </div>
 
-            <label for="js-description">Description:</label>
-            <input type="text" id="js-description" maxlength="35">
-
-            <label for="js-date">Date:</label>
+        <div class="form-group">
+          <label for="js-date">Date</label>
+          <div class="input-with-icon">
+            <i class="fa-solid fa-calendar"></i>
             <input type="date" id="js-date" required>
-
-            <button type="submit" class="add-trans" onclick="submitbtn()">Add Transaction</button>
-          </form>
+          </div>
         </div>
+
+        <button type="submit" class="primary-btn add-trans"><i class="fa-solid fa-check"></i> Add Transaction</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- User Info Modal -->
+  <div class="modal-overlay" id="userModal">
+    <div class="modal-content user-modal">
+      <div class="modal-header">
+        <h2>Welcome to FinTrack!</h2>
+        <button id="closeUserModal" class="close-btn"><i class="fa-solid fa-xmark"></i></button>
       </div>
-      <button class="clearbtn" onclick="clearAllTransactions()">Clear All Transactions</button>
-    </section>
-
-    <!-- userInfo form -->
-
-    <section id="userInfo">
-      <div class="modal-overlay" id="userModal">
-        <div class="oneTimeModal">
-          <h1>Welcome! Let's Set Up Your Finances</h1>
-          <form id="userInfoForm">
-            <label for="name">Username:</label>
-            <input type="text" id="name" required>
-
-            <label for="bankBalance">Bank Balance:</label>
-            <input type="number" id="bankBalance" required>
-
-            <label for="monthlyIncome">Monthly Income:</label>
-            <input type="number" id="monthlyIncome" required>
-
-            <label for="expenseLimit">Expense Limit:</label>
-            <input type="number" id="expenseLimit" required>
-
-            <button type="submit" id="saveInfo">Save</button>
-          </form>
+      
+      <p class="modal-subtitle">Let's set up your account to get started</p>
+      
+      <form id="userInfoForm">
+        <div class="form-group">
+          <label for="name">Your Name</label>
+          <div class="input-with-icon">
+            <i class="fa-solid fa-user"></i>
+            <input type="text" id="name" placeholder="Enter your name" required>
+          </div>
         </div>
-      </div>
-    </section>
 
-    <section id="permission">
-      <div class="permit">
-        <h1>Are you sure you want to delete all the Transactions/Data ?</h1>
-        <div class="permit-btns">
-          <button class="yes-btn">
-            Yes
-          </button>
-          <button class="no-btn">
-            No
-          </button>
+        <div class="form-group">
+          <label for="bankBalance">Current Bank Balance</label>
+          <div class="input-with-icon">
+            <i class="fa-solid fa-indian-rupee-sign"></i>
+            <input type="number" id="bankBalance" placeholder="Enter your current balance" required>
+          </div>
         </div>
+
+        <div class="form-group">
+          <label for="monthlyIncome">Monthly Income</label>
+          <div class="input-with-icon">
+            <i class="fa-solid fa-indian-rupee-sign"></i>
+            <input type="number" id="monthlyIncome" placeholder="Enter your monthly income" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="expenseLimit">Monthly Expense Limit</label>
+          <div class="input-with-icon">
+            <i class="fa-solid fa-indian-rupee-sign"></i>
+            <input type="number" id="expenseLimit" placeholder="Set a monthly expense limit" required>
+          </div>
+        </div>
+
+        <button type="submit" id="saveInfo" class="primary-btn"><i class="fa-solid fa-floppy-disk"></i> Save & Continue</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Confirmation Modal -->
+  <div id="permission" class="modal-overlay">
+    <div class="modal-content confirm-modal">
+      <div class="modal-header">
+        <h2>Confirm Action</h2>
+        <button class="close-btn close-confirm"><i class="fa-solid fa-xmark"></i></button>
       </div>
-    </section>
+      
+      <p class="confirm-message">Are you sure you want to delete all transactions? This action cannot be undone.</p>
+      
+      <div class="confirm-buttons">
+        <button class="danger-btn yes-btn">Yes, Delete All</button>
+        <button class="secondary-btn no-btn">Cancel</button>
+      </div>
+    </div>
+  </div>
 
-    <section id="resetEverything">
-      <button class="resetBtn" onclick="resetEverything()">
-        <i class="fa-solid fa-xmark"></i> Reset Everything</button>
-    </section>
-
-
-    <script src="script.js"></script>
-  </body>
-
+  <script src="script.js"></script>
+</body>
 </html>
