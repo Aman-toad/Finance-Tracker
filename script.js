@@ -1,306 +1,456 @@
-// Dark-Light mode code
-const toggleInp = document.getElementById('darkmode');
+const toggleInput = document.getElementById('darkmode');
+const body = document.body;
 
-toggleInp.addEventListener('change', () => {
-  const isDarkMode = toggleInp.checked;
-  document.body.classList.toggle("dark-mode", isDarkMode);
-  localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
-});
-
+// Load saved theme
 const savedTheme = localStorage.getItem('theme');
 if (savedTheme === 'dark') {
-  document.body.classList.add("dark-mode");
-  toggleInp.checked = true;
+  body.classList.add('dark-mode');
+  toggleInput.checked = true;
 }
 
-// transaction form opening code
-
-document.getElementById("openModal").addEventListener("click", function () {
-  const modal = document.getElementById("modal");
-  modal.style.display = "flex";
-  setTimeout(() => modal.classList.add("show"), 10);
+// Toggle theme
+toggleInput.addEventListener('change', () => {
+  const isDarkMode = toggleInput.checked;
+  body.classList.toggle('dark-mode', isDarkMode);
+  localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+  
+  // Update charts for better visibility in dark mode
+  updateCharts();
 });
 
-document.getElementById("closeModal").addEventListener("click", function () {
-  const modal = document.getElementById("modal");
-  modal.classList.remove("show");
-  setTimeout(() => modal.style.display = "none", 300);
-});
+// Transaction Modal
+const modal = document.getElementById('modal');
+const openModalBtn = document.getElementById('openModal');
+const quickAddBtn = document.getElementById('quick-add');
+const closeModalBtn = document.getElementById('closeModal');
 
-window.addEventListener("click", function (event) {
-  const modal = document.getElementById("modal");
+function openModal() {
+  modal.classList.add('show');
+  document.getElementById('js-amount').focus();
+}
+
+function closeModal() {
+  modal.classList.remove('show');
+  document.getElementById('transactionForm').reset();
+}
+
+openModalBtn.addEventListener('click', openModal);
+quickAddBtn.addEventListener('click', openModal);
+closeModalBtn.addEventListener('click', closeModal);
+
+// Close modal when clicking outside
+window.addEventListener('click', (event) => {
   if (event.target === modal) {
-    modal.classList.remove("show");
-    setTimeout(() => modal.style.display = "none", 300);
+    closeModal();
   }
 });
 
-// Userinfo form open code
+// User Info Modal
+const userModal = document.getElementById('userModal');
+const loginBtn = document.querySelector('.login-btn');
+const closeUserModalBtn = document.getElementById('closeUserModal');
 
-document.querySelector('.login-btn').addEventListener('click', function () {
-  const modalUser = document.getElementById('userModal');
-  modalUser.style.visibility = 'visible';
-  modalUser.style.opacity = '1'
-});
+function openUserModal() {
+  userModal.classList.add('show');
+  document.getElementById('name').focus();
+}
 
-window.addEventListener("click", function (event) {
-  const modalUser = document.getElementById("userModal");
-  if (event.target === modalUser) {
-    modalUser.style.visibility = 'hidden';
-    modalUser.style.opacity = '0'
+function closeUserModal() {
+  userModal.classList.remove('show');
+}
+
+loginBtn.addEventListener('click', openUserModal);
+closeUserModalBtn?.addEventListener('click', closeUserModal);
+
+// Close user modal when clicking outside
+window.addEventListener('click', (event) => {
+  if (event.target === userModal) {
+    closeUserModal();
   }
 });
 
-//taking the userinputs in fields of userinfo form
+// Confirmation Modal
+const permissionModal = document.getElementById('permission');
+const closeConfirmBtn = document.querySelector('.close-confirm');
+const yesBtn = document.querySelector('.yes-btn');
+const noBtn = document.querySelector('.no-btn');
 
-document.getElementById('saveInfo').addEventListener('click', function () {
+function openConfirmModal(message, onConfirm) {
+  document.querySelector('.confirm-message').textContent = message;
+  permissionModal.classList.add('show');
+  
+  // Remove previous event listeners
+  yesBtn.replaceWith(yesBtn.cloneNode(true));
+  noBtn.replaceWith(noBtn.cloneNode(true));
+  
+  // Add new event listeners
+  document.querySelector('.yes-btn').addEventListener('click', () => {
+    onConfirm();
+    closeConfirmModal();
+  });
+  
+  document.querySelector('.no-btn').addEventListener('click', closeConfirmModal);
+}
+
+function closeConfirmModal() {
+  permissionModal.classList.remove('show');
+}
+
+closeConfirmBtn?.addEventListener('click', closeConfirmModal);
+
+// Close confirm modal when clicking outside
+window.addEventListener('click', (event) => {
+  if (event.target === permissionModal) {
+    closeConfirmModal();
+  }
+});
+
+// user info
+document.getElementById('userInfoForm').addEventListener('submit', function(event) {
+  event.preventDefault();
+  
   const username = document.getElementById('name').value;
   const bankBalance = parseFloat(document.getElementById('bankBalance').value);
   const monthlyIncome = parseFloat(document.getElementById('monthlyIncome').value);
   const expenseLimit = parseFloat(document.getElementById('expenseLimit').value);
-
-  //store data in localStorage
+  
+  // Store data in localStorage
   const userData = { username, bankBalance, monthlyIncome, expenseLimit };
   localStorage.setItem('userData', JSON.stringify(userData));
-  document.getElementById('showBalance').innerHTML = `${bankBalance}`;
-
-  document.getElementById("userInfoForm").addEventListener("submit", function () {
-    this.reset();
-    const modalUser = document.getElementById("userModal");
-    modalUser.style.visibility = 'hidden';
-    modalUser.style.opacity = '0';
-    alert('Saved')
-  });
-
+  
+  // Update UI
+  document.getElementById('showBalance').textContent = bankBalance.toLocaleString();
   document.querySelector('.login-btn').style.display = 'none';
-  const showName = document.querySelector('.username');
-  showName.textContent = `${username}`
-  showName.style.display = 'block';
+  
+  const usernameElement = document.querySelector('.username');
+  usernameElement.textContent = username;
+  usernameElement.style.display = 'block';
+  
+  // Close modal and show success message
+  closeUserModal();
+  showNotification('Account setup successful!', 'success');
 });
 
-window.addEventListener("load", function () {
-  // Check if user data exists in localStorage
-  const userData = JSON.parse(localStorage.getItem('userData'));
-
-  if (userData) {
-    document.querySelector('.login-btn').style.display = 'none';
-    document.querySelector('.username').style.display = 'block';
-    document.querySelector('.username').innerHTML = userData.username;
-  }
-
-  let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
-  transactions.forEach(displayTransaction);
-  updateSummary();
-});
-
-document.getElementById("userInfoForm").addEventListener("submit", function (event) {
+document.getElementById('transactionForm').addEventListener('submit', function(event) {
   event.preventDefault();
-  this.reset()
-});
-
-// very important Transaction code
-
-function submitbtn() {
-  let description = document.getElementById('js-description').value;
-  let date = document.getElementById('js-date').value;
-  let category = document.getElementById("category").value;
-  let type = document.getElementById('type').value;
-  let amount = parseFloat(document.getElementById('js-amount').value);
-
-  const transaction = { description, date, category, type, amount };
+  
+  const amount = parseFloat(document.getElementById('js-amount').value);
+  const type = document.getElementById('type').value;
+  const category = document.getElementById('category').value;
+  const description = document.getElementById('js-description').value || category;
+  const date = document.getElementById('js-date').value;
+  
+  // Create transaction object
+  const transaction = {
+    id: Date.now(), // Unique ID for each transaction
+    amount,
+    type,
+    category,
+    description,
+    date
+  };
+  
+  // Add to localStorage
   let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
-  transactions.push(transaction)
+  transactions.push(transaction);
   localStorage.setItem('transactions', JSON.stringify(transactions));
-
+  
+  // Update UI
   displayTransaction(transaction);
   updateSummary();
-}
+  updateCharts();
+  
+  // Close modal and show success message
+  closeModal();
+  showNotification('Transaction added successfully!', 'success');
+});
 
-// function to display transaction cards
-
+// Display a single transaction
 function displayTransaction(transaction) {
-  const { description, date, category, type, amount } = transaction;
-  const displayCards = document.querySelector('.cards-box');
-
-  // Create the transaction card
-  const card = document.createElement('div');
-  card.classList.add('card');
-
-  // Left side
-  const leftSide = document.createElement('div');
-  leftSide.classList.add('left-side');
-
-  const amtCateg = document.createElement('div');
-  amtCateg.classList.add('amt-categ');
-
-  const amountSpan = document.createElement('span');
-  amountSpan.classList.add('amount');
-
-  // Apply color based on transaction type
-  if (type === 'income') {
-    amountSpan.textContent = `+₹${amount}`;
-    amountSpan.classList.add('add'); // Green color class
-  } else {
-    amountSpan.textContent = `-₹${amount}`;
-    amountSpan.classList.add('minus'); // Red color class
+  const transactionList = document.getElementById('transaction-list');
+  const emptyState = transactionList.querySelector('.empty-state');
+  
+  // Remove empty state if it exists
+  if (emptyState) {
+    emptyState.remove();
   }
-
-  const categorySpan = document.createElement('div');
-  categorySpan.classList.add('category');
-  categorySpan.textContent = ` (${category})`;
-
-  amtCateg.appendChild(amountSpan);
-  amtCateg.appendChild(categorySpan);
-
-  const descr = document.createElement('div');
-  descr.classList.add('descr');
-  const descriptionP = document.createElement('p');
-  descriptionP.classList.add('description');
-  descriptionP.textContent = description;
-  descr.appendChild(descriptionP);
-
-  // Right side
-  const rightSide = document.createElement('div');
-  rightSide.classList.add('right-side');
-  const dateP = document.createElement('p');
-  dateP.classList.add('date');
-  dateP.textContent = date;
-  rightSide.appendChild(dateP);
-
-  // Append all parts
-  leftSide.appendChild(amtCateg);
-  leftSide.appendChild(descr);
-  card.appendChild(leftSide);
-  card.appendChild(rightSide);
-
-  const generatedColor = getRandomColor();
-  card.style.background = generatedColor;
-
-  // Append the card to the container
-  displayCards.appendChild(card);
-
-  document.getElementById("transactionForm").addEventListener("submit", function (event) {
-    event.preventDefault();
-    this.reset()
+  
+  // Create transaction item
+  const transactionItem = document.createElement('div');
+  transactionItem.classList.add('transaction-item');
+  transactionItem.dataset.id = transaction.id;
+  
+  // Get icon based on category
+  const categoryIcon = getCategoryIcon(transaction.category);
+  
+  // Format date
+  const formattedDate = formatDate(transaction.date);
+  
+  // Create HTML structure
+  transactionItem.innerHTML = `
+    <div class="transaction-info">
+      <div class="category-icon">
+        <i class="${categoryIcon}"></i>
+      </div>
+      <div class="transaction-details">
+        <h4>${transaction.description}</h4>
+        <div class="transaction-date">${formattedDate}</div>
+      </div>
+    </div>
+    <div class="transaction-amount ${transaction.type}">
+      ${transaction.type === 'income' ? '+' : '-'}₹${transaction.amount.toLocaleString()}
+    </div>
+  `;
+  
+  // Add delete functionality on hover
+  const deleteBtn = document.createElement('button');
+  deleteBtn.classList.add('delete-transaction');
+  deleteBtn.innerHTML = '<i class="fa-solid fa-trash"></i>';
+  deleteBtn.style.display = 'none';
+  deleteBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    deleteTransaction(transaction.id);
   });
-
-  document.querySelector('.first-card').style.display = 'none'
+  
+  transactionItem.appendChild(deleteBtn);
+  
+  // Show/hide delete button on hover
+  transactionItem.addEventListener('mouseenter', () => {
+    deleteBtn.style.display = 'block';
+  });
+  
+  transactionItem.addEventListener('mouseleave', () => {
+    deleteBtn.style.display = 'none';
+  });
+  
+  // Add to the list
+  transactionList.prepend(transactionItem);
 }
 
-//function to generate random color cards
-function getRandomColor() {
-  let randomColor = [
-    'linear-gradient(to right,#707619, #00ff00)',
-    'linear-gradient(90deg, #020024 0%, #090979 35%, #00d4ff 100%)',
-    'radial-gradient(circle, #5c0067 0%, #00d4ff 100%)',
-    'linear-gradient(135deg, orange 60%, cyan)',
-    'linear-gradient(135deg, #2ecc71, #27ae60, #3498db, #2980b9)',
-    'linear-gradient(135deg, #2ecc71, #3498db)',
-    'linear-gradient(120deg, #3498db, #9b59b6)',
-    'linear-gradient(130deg, #f1c40f, #2c3e50)',
-    'linear-gradient(140deg, #1abc9c, #34495e)',
-    'linear-gradient(145deg, #2ecc71, #2c3e50)',
-    'linear-gradient(150deg, #9b59b6, #e74c3c)',
-    'linear-gradient(160deg, #2980b9, #1abc9c)',
-    'linear-gradient(170deg, #145a32, #2ecc71)',
-    'linear-gradient(180deg, #2c3e50, #1abc9c)',
-    'linear-gradient(190deg, #f39c12, #9b59b6)'
-  ];
-  let i = Math.floor(Math.random() * randomColor.length);
-  return randomColor[i];
+//  icon based on category
+function getCategoryIcon(category) {
+  const icons = {
+    food: 'fa-solid fa-utensils',
+    travel: 'fa-solid fa-plane',
+    shopping: 'fa-solid fa-cart-shopping',
+    rent: 'fa-solid fa-house',
+    salary: 'fa-solid fa-money-bill-wave',
+    investment: 'fa-solid fa-chart-line',
+    entertainment: 'fa-solid fa-film',
+    utilities: 'fa-solid fa-bolt',
+    other: 'fa-solid fa-ellipsis'
+  };
+  
+  return icons[category] || 'fa-solid fa-circle';
 }
 
-// update summary
+// Format date
+function formatDate(dateString) {
+  const options = { year: 'numeric', month: 'short', day: 'numeric' };
+  return new Date(dateString).toLocaleDateString(undefined, options);
+}
+
+// Delete a transaction
+function deleteTransaction(id) {
+  let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+  transactions = transactions.filter(transaction => transaction.id !== id);
+  localStorage.setItem('transactions', JSON.stringify(transactions));
+  
+  // Remove from UI
+  document.querySelector(`.transaction-item[data-id="${id}"]`).remove();
+  
+  // Update summary and charts
+  updateSummary();
+  updateCharts();
+  
+  // Show empty state if no transactions
+  if (transactions.length === 0) {
+    showEmptyState();
+  }
+  
+  showNotification('Transaction deleted!', 'warning');
+}
+
+// Show empty state
+function showEmptyState() {
+  const transactionList = document.getElementById('transaction-list');
+  
+  if (transactionList.children.length === 0) {
+    const emptyState = document.createElement('div');
+    emptyState.classList.add('empty-state');
+    emptyState.innerHTML = `
+      <i class="fa-solid fa-receipt"></i>
+      <p>No transactions yet. Add your first transaction to get started!</p>
+    `;
+    transactionList.appendChild(emptyState);
+  }
+}
+
+// Clear all transactions
+document.querySelector('.clearbtn').addEventListener('click', function() {
+  openConfirmModal('Are you sure you want to delete all transactions? This action cannot be undone.', clearAllTransactions);
+});
+
+function clearAllTransactions() {
+  localStorage.removeItem('transactions');
+  
+  // Clear transaction list
+  const transactionList = document.getElementById('transaction-list');
+  transactionList.innerHTML = '';
+  showEmptyState();
+  
+  // Update summary and charts
+  updateSummary();
+  updateCharts();
+  
+  showNotification('All transactions cleared!', 'warning');
+}
+
+// Reset everything
+document.querySelector('.resetBtn').addEventListener('click', function() {
+  openConfirmModal('Are you sure you want to reset everything? This will delete all your data including account information.', resetEverything);
+});
+
+function resetEverything() {
+  localStorage.removeItem('transactions');
+  localStorage.removeItem('userData');
+  
+  // Reload page
+  location.reload();
+}
+
+// Summary
 function updateSummary() {
-  let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
-  let userData = JSON.parse(localStorage.getItem('userData'));
-  let income = 0, expenses = 0, currentBalance = userData.bankBalance;
-  parseFloat(income, expenses, bankBalance);
-
+  const transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+  const userData = JSON.parse(localStorage.getItem('userData')) || { bankBalance: 0 };
+  
+  let totalIncome = 0;
+  let totalExpenses = 0;
+  
   transactions.forEach(transaction => {
     if (transaction.type === 'income') {
-      income += transaction.amount;
-      currentBalance += income;
-    } else if (transaction.type === 'expense') {
-      expenses += transaction.amount;
-      currentBalance -= expenses;
+      totalIncome += transaction.amount;
+    } else {
+      totalExpenses += transaction.amount;
     }
-    document.getElementById('charts').style.display = 'flex';
-    document.querySelector('.right-dashboard').style.display='block'
   });
-
-  document.getElementById('showIncome').textContent = `${income}`;
-  document.getElementById('showExpense').textContent = `${expenses}`
-  document.getElementById('showBalance').textContent = `${currentBalance}`;
-
-  updatePieChart();
-  renderBarChart();
-  createLineChart();
+  
+  const currentBalance = userData.bankBalance + totalIncome - totalExpenses;
+  
+  // Update UI
+  document.getElementById('showIncome').textContent = totalIncome.toLocaleString();
+  document.getElementById('showExpense').textContent = totalExpenses.toLocaleString();
+  document.getElementById('showBalance').textContent = currentBalance.toLocaleString();
 }
 
-//function to show expense chart
+// Initialize charts
+let expenseChart, barChart, lineChart;
+
+function updateCharts() {
+  updatePieChart();
+  updateBarChart();
+  updateLineChart();
+}
+
 function updatePieChart() {
-  let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
-
-  let categoryTotals = {};
-
+  const transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+  const isDarkMode = body.classList.contains('dark-mode');
+  
+  // Calculate category totals for expenses
+  const categoryTotals = {};
   transactions.forEach(transaction => {
     if (transaction.type === 'expense') {
-      categoryTotals[transaction.category] =
-        (categoryTotals[transaction.category] || 0) + parseFloat(transaction.amount);
+      categoryTotals[transaction.category] = (categoryTotals[transaction.category] || 0) + transaction.amount;
     }
   });
-
-  let categories = Object.keys(categoryTotals);
-  let values = Object.values(categoryTotals);
-
-  // Destroy existing chart to prevent duplication
-  if (window.expenseChart instanceof Chart) {
-    window.expenseChart.destroy();
+  
+  const categories = Object.keys(categoryTotals);
+  const values = Object.values(categoryTotals);
+  
+  // Colors for categories
+  const backgroundColors = [
+    '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
+    '#FF9F40', '#8AC249', '#EA80FC', '#00E5FF', '#FF5252'
+  ];
+  
+  // Destroy existing chart
+  if (expenseChart instanceof Chart) {
+    expenseChart.destroy();
   }
-
-  let ctx = document.getElementById('expenseChart').getContext('2d');
-  window.expenseChart = new Chart(ctx, {
-    type: 'pie',
-    data: {
-      labels: categories,
-      datasets: [{
-        data: values,
-        backgroundColor: ['#ff6384', '#36a2eb', '#ffce56', '#4bc0c0', '#9966ff'],
-      }]
-    }
-  });
+  
+  // Create new chart if we have data
+  if (categories.length > 0) {
+    const ctx = document.getElementById('expenseChart').getContext('2d');
+    expenseChart = new Chart(ctx, {
+      type: 'pie',
+      data: {
+        labels: categories,
+        datasets: [{
+          data: values,
+          backgroundColor: backgroundColors,
+          borderColor: isDarkMode ? '#1e1e1e' : '#ffffff',
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'right',
+            labels: {
+              color: isDarkMode ? '#e0e0e0' : '#333333'
+            }
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                const label = context.label || '';
+                const value = context.raw;
+                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                const percentage = Math.round((value / total) * 100);
+                return `${label}: ₹${value.toLocaleString()} (${percentage}%)`;
+              }
+            }
+          }
+        }
+      }
+    });
+  }
 }
 
-//function for the bar chart
-function renderBarChart() {
-  let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
-
-  let incomeTotal = 0, expenseTotal = 0;
-
+function updateBarChart() {
+  const transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+  const isDarkMode = body.classList.contains('dark-mode');
+  
+  // Calculate totals
+  let totalIncome = 0;
+  let totalExpenses = 0;
+  
   transactions.forEach(transaction => {
     if (transaction.type === 'income') {
-      incomeTotal += Number(transaction.amount);
+      totalIncome += transaction.amount;
     } else {
-      expenseTotal += Number(transaction.amount);
+      totalExpenses += transaction.amount;
     }
   });
-
-  const ctx = document.getElementById("barChart").getContext("2d");
-
-  if (window.barChart instanceof Chart) {
-    window.barChart.destroy(); // Destroy old chart before creating a new one
+  
+  // Destroy existing chart
+  if (barChart instanceof Chart) {
+    barChart.destroy();
   }
-
-  window.barChart = new Chart(ctx, {
-    type: "bar",
+  
+  // Create new chart
+  const ctx = document.getElementById('barChart').getContext('2d');
+  barChart = new Chart(ctx, {
+    type: 'bar',
     data: {
-      labels: ["Income", "Expenses"],
+      labels: ['Income', 'Expenses'],
       datasets: [{
-        label: "Amount (₹)",
-        data: [incomeTotal, expenseTotal],
-        backgroundColor: ["#4CAF50", "#FF4D4D"], // Green for income, red for expenses
-        borderWidth: 1
+        label: 'Amount (₹)',
+        data: [totalIncome, totalExpenses],
+        backgroundColor: ['#38b000', '#ff5252'],
+        borderColor: isDarkMode ? '#1e1e1e' : '#ffffff',
+        borderWidth: 2
       }]
     },
     options: {
@@ -308,9 +458,34 @@ function renderBarChart() {
       scales: {
         y: {
           beginAtZero: true,
-          suggestedMax: Math.max(incomeTotal, expenseTotal) + 200,
+          grid: {
+            color: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
+          },
           ticks: {
-            stepSize: 100
+            color: isDarkMode ? '#e0e0e0' : '#333333',
+            callback: function(value) {
+              return '₹' + value.toLocaleString();
+            }
+          }
+        },
+        x: {
+          grid: {
+            display: false
+          },
+          ticks: {
+            color: isDarkMode ? '#e0e0e0' : '#333333'
+          }
+        }
+      },
+      plugins: {
+        legend: {
+          display: false
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              return '₹' + context.raw.toLocaleString();
+            }
           }
         }
       }
@@ -318,36 +493,100 @@ function renderBarChart() {
   });
 }
 
-//function to show the line chart
-function createLineChart() {
+function updateLineChart() {
+  const transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+  const isDarkMode = body.classList.contains('dark-mode');
+  
+  // Group transactions by month
+  const monthlyData = {};
+  
+  // Initialize all months
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  months.forEach(month => {
+    monthlyData[month] = { income: 0, expense: 0 };
+  });
+  
+  // Fill with actual data
+  transactions.forEach(transaction => {
+    const date = new Date(transaction.date);
+    const month = months[date.getMonth()];
+    
+    if (transaction.type === 'income') {
+      monthlyData[month].income += transaction.amount;
+    } else {
+      monthlyData[month].expense += transaction.amount;
+    }
+  });
+  
+  // Prepare data for chart
+  const incomeData = months.map(month => monthlyData[month].income);
+  const expenseData = months.map(month => monthlyData[month].expense);
+  
+  // Destroy existing chart
+  if (lineChart instanceof Chart) {
+    lineChart.destroy();
+  }
+  
+  // Create new chart
   const ctx = document.getElementById('lineChart').getContext('2d');
-
-  const lineChart = new Chart(ctx, {
+  lineChart = new Chart(ctx, {
     type: 'line',
     data: {
-      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'], // months
-      datasets: [{
-        label: 'Income', // Dataset for income
-        data: [12000, 15000, 17000, 16000, 18000, 20000, 21000, 22000, 24000, 25000, 27000, 30000], // sample data
-        borderColor: 'green',
-        fill: false, // Line without filling the area
-        tension: 0.1 // Smoothness of the line
-      },
-      {
-        label: 'Expenses', // Dataset for expenses
-        data: [5000, 6000, 7000, 7500, 8000, 9000, 10000, 11000, 12000, 13000, 14000, 15000], // sample data
-        borderColor: 'red',
-        fill: false,
-        tension: 0.1
-      }]
+      labels: months,
+      datasets: [
+        {
+          label: 'Income',
+          data: incomeData,
+          borderColor: '#38b000',
+          backgroundColor: 'rgba(56, 176, 0, 0.1)',
+          tension: 0.3,
+          fill: true
+        },
+        {
+          label: 'Expenses',
+          data: expenseData,
+          borderColor: '#ff5252',
+          backgroundColor: 'rgba(255, 82, 82, 0.1)',
+          tension: 0.3,
+          fill: true
+        }
+      ]
     },
     options: {
+      responsive: true,
       scales: {
         y: {
-          beginAtZero: true, // Ensure the Y-axis starts at 0
+          beginAtZero: true,
+          grid: {
+            color: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
+          },
           ticks: {
-            max: 35000, // Adjust the maximum Y-axis value
-            stepSize: 5000 // Adjust step size for better readability
+            color: isDarkMode ? '#e0e0e0' : '#333333',
+            callback: function(value) {
+              return '₹' + value.toLocaleString();
+            }
+          }
+        },
+        x: {
+          grid: {
+            color: isDarkMode ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)'
+          },
+          ticks: {
+            color: isDarkMode ? '#e0e0e0' : '#333333'
+          }
+        }
+      },
+      plugins: {
+        legend: {
+          labels: {
+            color: isDarkMode ? '#e0e0e0' : '#333333'
+          }
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              return context.dataset.label + ': ₹' + context.raw.toLocaleString();
+            }
           }
         }
       }
@@ -355,63 +594,150 @@ function createLineChart() {
   });
 }
 
-
-// Load transactions on page load
-window.addEventListener("load", function () {
-  updateSummary();
-  updatePieChart();
-  renderBarChart();
-  createLineChart();
-});
-
-// clear all transaction 
-function clearAllTransactions() {
-  const clear = document.getElementById('permission');
-  clear.style.visibility = 'visible';
-  clear.style.opacity = '1';
-
-  const yes = document.querySelector('.yes-btn');
-  const no = document.querySelector('.no-btn');
-
-  yes.addEventListener('click', () => {
-    localStorage.removeItem('transactions');
-    clear.style.visibility = 'hidden';
-    clear.style.opacity = '0';
-    location.reload();
-
+// NOTIFICATIONS 
+function showNotification(message, type = 'info') {
+  // Create notification element
+  const notification = document.createElement('div');
+  notification.classList.add('notification', type);
+  
+  // Set icon based on type
+  let icon = 'fa-info-circle';
+  if (type === 'success') icon = 'fa-check-circle';
+  if (type === 'warning') icon = 'fa-exclamation-triangle';
+  if (type === 'error') icon = 'fa-times-circle';
+  
+  notification.innerHTML = `
+    <i class="fas ${icon}"></i>
+    <p>${message}</p>
+  `;
+  
+  // Add styles
+  Object.assign(notification.style, {
+    position: 'fixed',
+    bottom: '20px',
+    right: '20px',
+    padding: '12px 20px',
+    borderRadius: '8px',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+    zIndex: '9999',
+    transform: 'translateY(100px)',
+    opacity: '0',
+    transition: 'all 0.3s ease'
   });
-  no.addEventListener('click', () => {
-    clear.style.visibility = 'hidden';
-    clear.style.opacity = '0';
-  })
-};
-
-window.addEventListener("click", function (event) {
-  const clear = document.getElementById("permission");
-  if (event.target === clear) {
-    clear.style.visibility = 'hidden';
-    clear.style.opacity = '0'
+  
+  // Set colors based on type
+  if (type === 'success') {
+    notification.style.backgroundColor = '#38b000';
+    notification.style.color = 'white';
+  } else if (type === 'warning') {
+    notification.style.backgroundColor = '#ffbe0b';
+    notification.style.color = '#333';
+  } else if (type === 'error') {
+    notification.style.backgroundColor = '#ff5252';
+    notification.style.color = 'white';
+  } else {
+    notification.style.backgroundColor = '#3a86ff';
+    notification.style.color = 'white';
   }
+  
+  // Add to DOM
+  document.body.appendChild(notification);
+  
+  // Animate in
+  setTimeout(() => {
+    notification.style.transform = 'translateY(0)';
+    notification.style.opacity = '1';
+  }, 10);
+  
+  // Remove after delay
+  setTimeout(() => {
+    notification.style.transform = 'translateY(100px)';
+    notification.style.opacity = '0';
+    
+    // Remove from DOM after animation
+    setTimeout(() => {
+      notification.remove();
+    }, 300);
+  }, 3000);
+}
+
+window.addEventListener('load', function() {
+  // Check if user data exists
+  const userData = JSON.parse(localStorage.getItem('userData'));
+  
+  if (userData) {
+    // User already set up
+    document.querySelector('.login-btn').style.display = 'none';
+    const usernameElement = document.querySelector('.username');
+    usernameElement.textContent = userData.username;
+    usernameElement.style.display = 'block';
+  } else {
+    // Show setup modal on first visit
+    setTimeout(openUserModal, 1000);
+  }
+  
+  // Load transactions
+  const transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+  
+  if (transactions.length > 0) {
+    // Sort transactions by date 
+    transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+    
+    // Display transactions
+    transactions.forEach(displayTransaction);
+  } else {
+    showEmptyState();
+  }
+  
+  // Update summary and charts
+  updateSummary();
+  updateCharts();
+  
+  // Set active nav item based on scroll position
+  const sections = document.querySelectorAll('section');
+  const navLinks = document.querySelectorAll('.main-nav a');
+  
+  window.addEventListener('scroll', () => {
+    let current = '';
+    
+    sections.forEach(section => {
+      const sectionTop = section.offsetTop;
+      const sectionHeight = section.clientHeight;
+      
+      if (pageYOffset >= sectionTop - 200) {
+        current = section.getAttribute('id');
+      }
+    });
+    
+    navLinks.forEach(link => {
+      link.classList.remove('active');
+      if (link.getAttribute('href').substring(1) === current) {
+        link.classList.add('active');
+      }
+    });
+  });
 });
 
-function resetEverything() {
-  const clear = document.getElementById('permission');
-  clear.style.visibility = 'visible';
-  clear.style.opacity = '1';
-
-  const yes = document.querySelector('.yes-btn');
-  const no = document.querySelector('.no-btn');
-
-  yes.addEventListener('click', () => {
-    localStorage.removeItem('transactions');
-    localStorage.removeItem('userData');
-    clear.style.visibility = 'hidden';
-    clear.style.opacity = '0';
-    location.reload();
-
+// Add smooth scrolling for navigation
+document.querySelectorAll('.main-nav a').forEach(anchor => {
+  anchor.addEventListener('click', function(e) {
+    e.preventDefault();
+    
+    const targetId = this.getAttribute('href');
+    const targetElement = document.querySelector(targetId);
+    
+    window.scrollTo({
+      top: targetElement.offsetTop - 100,
+      behavior: 'smooth'
+    });
+    
+    // Update active class
+    document.querySelectorAll('.main-nav a').forEach(link => {
+      link.classList.remove('active');
+    });
+    this.classList.add('active');
   });
-  no.addEventListener('click', () => {
-    clear.style.visibility = 'hidden';
-    clear.style.opacity = '0';
-  })
-};
+});
